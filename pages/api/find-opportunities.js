@@ -1,5 +1,30 @@
 import OpenAI from 'openai';
 
+// Function to generate future dates within 90 days
+function generateFutureDates(count = 8) {
+  const dates = [];
+  const today = new Date();
+  const endDate = new Date(today.getTime() + (90 * 24 * 60 * 60 * 1000)); // 90 days from now
+  
+  for (let i = 0; i < count; i++) {
+    // Generate random date between today and 90 days from now
+    const randomTime = today.getTime() + Math.random() * (endDate.getTime() - today.getTime());
+    const randomDate = new Date(randomTime);
+    
+    // Format as "Month Day, Year"
+    const formattedDate = randomDate.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    
+    dates.push(formattedDate);
+  }
+  
+  return dates.sort((a, b) => new Date(a) - new Date(b)); // Sort chronologically
+}
+
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
