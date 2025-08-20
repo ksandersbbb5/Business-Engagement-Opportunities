@@ -1,5 +1,6 @@
 # BBB Business Engagement Opportunities
 
+
 A Next.js application that helps BBB Business Engagement Coordinators find relevant business events and networking opportunities in their service areas.
 
 ## Features
