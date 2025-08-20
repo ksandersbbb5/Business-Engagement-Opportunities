@@ -1,9 +1,5 @@
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -18,34 +14,44 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { serviceAreas, bbbTopics, timeframe } = req.body;
-
   try {
-    const prompt = `Find real business events in Massachusetts, Maine, Rhode Island, and Vermont for the next 90 days. Focus on events suitable for small businesses (1-50 employees) including networking events, conferences, workshops, trade shows, and Chamber of Commerce meetings.
+    console.log('API called - checking OpenAI setup');
+    
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OpenAI API key not found');
+    }
 
-For each event, provide:
-- Date
-- Location (city and venue)
-- Cost
-- Event name
-- Audience type and size
-- Contact information
-- Website link
-- Why BBB should attend (focus on networking, recruiting accredited businesses, presenting on business ethics/trust)
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
 
-Return up to 50 events per state in this JSON format:
+    const { serviceAreas, bbbTopics, timeframe } = req.body;
+
+    console.log('Making OpenAI request...');
+
+    const prompt = `You are a business research expert. Find real, current business events in Massachusetts, Maine, Rhode Island, and Vermont for the next 90 days. Focus on:
+
+- Small business networking events
+- Chamber of Commerce meetings  
+- Business conferences and trade shows
+- Professional development workshops
+- Entrepreneur meetups
+
+For each event found, provide accurate information including real website links. Return up to 15-20 events per state.
+
+Return results in this exact JSON format:
 
 {
   "Massachusetts": [
     {
       "date": "March 15, 2025",
-      "location": "Boston, MA",
-      "cost": "$75 registration",
-      "name": "Business Event Name",
-      "audienceType": "Small business owners, entrepreneurs",
-      "contactInfo": "contact@email.com",
-      "link": "https://website.com",
-      "whyBBBShouldBeThere": "Networking opportunity explanation"
+      "location": "Boston, MA - Convention Center",
+      "cost": "$125 registration",
+      "name": "New England Small Business Expo",
+      "audienceType": "Small business owners, entrepreneurs (500+ attendees)",
+      "contactInfo": "info@businessevent.com",
+      "link": "https://www.businessevent.com",
+      "whyBBBShouldBeThere": "Large networking opportunity to present on business ethics and recruit accredited members from diverse industries."
     }
   ],
   "Maine": [],
@@ -53,43 +59,20 @@ Return up to 50 events per state in this JSON format:
   "Vermont": []
 }
 
-Only include real events with actual websites. Order states as: Massachusetts, Maine, Rhode Island, Vermont.`;
+Important: Only include real events with actual websites. Order states as: Massachusetts, Maine, Rhode Island, Vermont.`;
 
     const completion = await openai.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
-      model: 'gpt-4',
+      model: 'gpt-4o-mini',
       temperature: 0.3,
-      max_tokens: 8000,
+      max_tokens: 6000,
     });
+
+    console.log('OpenAI response received');
 
     let results;
     try {
-      results = JSON.parse(completion.choices[0].message.content);
-    } catch (parseError) {
-      console.error('JSON parsing error:', parseError);
-      results = {
-        "Massachusetts": [{
-          "date": "March 15, 2025",
-          "location": "Boston, MA",
-          "cost": "$75 registration",
-          "name": "Sample Business Event",
-          "audienceType": "Small business owners",
-          "contactInfo": "info@example.com",
-          "link": "https://example.com",
-          "whyBBBShouldBeThere": "Networking opportunity with local businesses"
-        }],
-        "Maine": [],
-        "Rhode Island": [],
-        "Vermont": []
-      };
-    }
-
-    res.status(200).json(results);
-  } catch (error) {
-    console.error('API Error:', error);
-    res.status(500).json({ 
-      message: 'Failed to fetch opportunities',
-      error: error.message 
-    });
-  }
-}
+      const responseText = completion.choices[0].message.content;
+      console.log('Parsing OpenAI response...');
+      
+      // C
