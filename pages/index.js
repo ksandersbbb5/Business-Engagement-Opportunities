@@ -141,17 +141,13 @@ export default function Home() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <div className="w-16 h-16 mr-4">
-              <svg viewBox="0 0 200 200" className="w-full h-full">
-                <circle cx="100" cy="100" r="100" fill="#1f5f73"/>
-                <g fill="white">
-                  <path d="M85 60 Q100 45 115 60 Q110 75 100 80 Q90 75 85 60 Z"/>
-                  <path d="M85 80 Q100 65 115 80 Q110 95 100 100 Q90 95 85 80 Z"/>
-                  <rect x="85" y="100" width="30" height="4"/>
-                  <text x="100" y="130" textAnchor="middle" fontSize="24" fontWeight="bold">BBB</text>
-                </g>
-              </svg>
-            </div>
+         <img 
+  src="/images/bbb-logo.png" 
+  alt="BBB Logo" 
+  className="w-16 h-16 mr-4"
+  style={{ fontFamily: 'Arial, sans-serif' }}
+/>
+  
             <h1 className="text-4xl font-bold text-gray-900" style={{ fontFamily: 'Arial, sans-serif' }}>
               Business Engagement Opportunities
             </h1>
