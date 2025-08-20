@@ -42,14 +42,40 @@ Return valid JSON only with this structure:
       max_tokens: 6000,
     });
 
-    let results;
-    try {
-      const responseText = completion.choices[0].message.content.trim();
-      const cleanedResponse = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-      results = JSON.parse(cleanedResponse);
+ let results;
+try {
+  const responseText = completion.choices[0].message.content.trim();
+  const cleanedResponse = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+  results = JSON.parse(cleanedResponse);
+  
+  // Validate we have good results for all states
+  const states = ['Massachusetts', 'Maine', 'Rhode Island', 'Vermont'];
+  let totalEvents = 0;
+  let hasEmptyStates = false;
+  
+  states.forEach(state => {
+    if (!results[state]) results[state] = [];
+    totalEvents += results[state].length;
+    if (results[state].length === 0) {
+      hasEmptyStates = true;
+      console.log(`Warning: ${state} has 0 events`);
+    }
+  });
+  
+  console.log(`OpenAI found ${totalEvents} total events across all states`);
+  
+  // If any state is empty or total is too low, use fallback
+  if (hasEmptyStates || totalEvents < 15) {
+    console.log('Using fallback due to insufficient OpenAI results');
+    throw new Error('Insufficient OpenAI results');
+  }
+  
+  console.log('OpenAI results validated successfully');
+} catch (parseError) {
+
+
+
       
-      console.log('OpenAI results parsed successfully');
-    } catch (parseError) {
       console.log('Using fallback data');
       
       results = {
