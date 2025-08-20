@@ -5,6 +5,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState('');
+  const [searchTime, setSearchTime] = useState(null);
 
   const serviceAreas = [
     'Vermont',
@@ -32,8 +33,10 @@ export default function Home() {
   ];
 
   const findOpportunities = async () => {
+    const startTime = Date.now();
     setIsLoading(true);
     setError('');
+    setSearchTime(null);
     
     try {
       const response = await fetch('/api/find-opportunities', {
@@ -53,7 +56,13 @@ export default function Home() {
       }
 
       const data = await response.json();
+      const endTime = Date.now();
+      const duration = Math.round((endTime - startTime) / 1000);
+      const minutes = Math.floor(duration / 60);
+      const seconds = duration % 60;
+      
       setResults(data);
+      setSearchTime({ minutes, seconds });
     } catch (err) {
       setError('Unable to fetch opportunities at this time. Please try again later.');
       console.error('Error:', err);
@@ -132,16 +141,27 @@ export default function Home() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mr-4">
-              <span className="text-white font-bold text-xl">BBB</span>
+            <div className="w-16 h-16 mr-4">
+              <svg viewBox="0 0 200 200" className="w-full h-full">
+                <circle cx="100" cy="100" r="100" fill="#1f5f73"/>
+                <g fill="white">
+                  <path d="M85 60 Q100 45 115 60 Q110 75 100 80 Q90 75 85 60 Z"/>
+                  <path d="M85 80 Q100 65 115 80 Q110 95 100 100 Q90 95 85 80 Z"/>
+                  <rect x="85" y="100" width="30" height="4"/>
+                  <text x="100" y="130" textAnchor="middle" fontSize="24" fontWeight="bold">BBB</text>
+                </g>
+              </svg>
             </div>
             <h1 className="text-4xl font-bold text-gray-900" style={{ fontFamily: 'Arial, sans-serif' }}>
               Business Engagement Opportunities
             </h1>
           </div>
           
+          <p className="text-lg text-gray-600 mb-4 max-w-3xl mx-auto" style={{ fontFamily: 'Arial, sans-serif' }}>
+            This will generate what business focus events are occurring
+          </p>
           <p className="text-lg text-gray-600 mb-8 max-w-3xl mx-auto" style={{ fontFamily: 'Arial, sans-serif' }}>
-            This will generate what business focus events are occurring in our service area in the next 90 days.
+            in our service area in the next 90 days.
           </p>
           
           <button
@@ -182,6 +202,14 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Search Completion Message */}
+        {searchTime && results && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-6" 
+               style={{ fontFamily: 'Arial, sans-serif' }}>
+            Search completed in {searchTime.minutes > 0 ? `${searchTime.minutes} minute${searchTime.minutes > 1 ? 's' : ''} and ` : ''}{searchTime.seconds} second{searchTime.seconds !== 1 ? 's' : ''}
+          </div>
+        )}
+
         {/* Error Message */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6" 
@@ -197,7 +225,7 @@ export default function Home() {
               <div key={state}>
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-gray-300" 
                     style={{ fontFamily: 'Arial, sans-serif' }}>
-                  {state}
+                  {state} - {events.length} Opportunit{events.length === 1 ? 'y' : 'ies'} Found
                 </h2>
                 <div className="grid gap-6 md:grid-cols-2">
                   {events.map((event, index) => (
