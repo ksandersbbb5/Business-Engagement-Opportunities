@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // For now, return sample data until OpenAI is configured
+    // Sample data for testing
     const sampleResults = {
       "Massachusetts": [
         {
@@ -38,6 +38,18 @@ export default async function handler(req, res) {
           "contactInfo": "hello@vtentrepreneurs.org",
           "link": "https://vtentrepreneurs.org",
           "whyBBBShouldBeThere": "Intimate setting perfect for one-on-one conversations about BBB accreditation benefits. Strong alignment with BBB's mission to support small business growth and ethical practices."
+        }
+      ],
+      "Maine": [
+        {
+          "date": "March 28, 2025",
+          "location": "Portland, ME",
+          "cost": "$50 registration",
+          "name": "Maine Small Business Development Conference",
+          "audienceType": "Small business owners, local entrepreneurs",
+          "contactInfo": "events@mainebusiness.org",
+          "link": "https://mainebusinessconf.com",
+          "whyBBBShouldBeThere": "Excellent opportunity to present on business ethics and customer trust. Maine has a strong community of small businesses that value BBB's mission of marketplace trust."
         }
       ]
     };
